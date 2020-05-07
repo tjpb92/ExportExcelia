@@ -1,0 +1,32 @@
+prod.mongodb.name=Base de données de production
+prod.mongodb.host=host
+prod.mongodb.port=3123
+prod.mongodb.username=user
+prod.mongodb.passwd=passwd
+prod.mongodb.database=db
+
+dev.mongodb.name=Base de données de développement
+dev.mongodb.host=host
+dev.mongodb.port=3123
+dev.mongodb.username=user
+dev.mongodb.passwd=passwd
+dev.mongodb.database=db
+
+# Pour les tests
+# Le numéro de port ne doit pas être numérique
+# l'identifiant de l'utilisateur doit être vide
+test.mongodb.name=Base de données de développement
+test.mongodb.host=host
+test.mongodb.port=unNombre
+test.mongodb.username=
+test.mongodb.passwd=passwd
+test.mongodb.database=db
+
+# Mailserver
+mailServer.name=Serveur de messagerie
+mailServer.host=1.2.3.4
+mailServer.port=25
+mailServer.username=user
+mailServer.passwd=password
+mailServer.fromAddress=emetteur@domain.com
+mailServer.toAddress=destinataire@destination.com
