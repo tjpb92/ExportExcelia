@@ -9,15 +9,15 @@ java -jar ExportExcelia.jar [-db db] [[-b début] [-e fin]|-n nbJour]
 ```
 où :
 * ```-db db``` est la référence à la base de données, par défaut désigne la base de données de développement. Voir fichier *ExportExcelia.prop* (optionnel).
-* ```-b début``` : date de début de l'extraction à 0h au format JJ/MM/AAAA. Amorcé à hier par défaut (paramètre optionnel).
-* ```-e fin``` : date de fin de l'extraction à 0h au format JJ/MM/AAAA. Amorcé à aujourd'hui par défaut (paramètre optionnel).
-* ```-n nbJour``` : précise le nombre de jour(s) à compter de la date courante. Non défini par défaut (paramètre optionnel).
-* ```-cc callCenter``` est la référence au centre d'appel. Armorcé à vide par défaut (paramètre optionnel).
+* ```-b début``` est la date de début de l'extraction à 0h au format JJ/MM/AAAA. Amorcée à une semaine en arrière par défaut (paramètre optionnel).
+* ```-e fin``` est la date de fin de l'extraction à 0h au format JJ/MM/AAAA. Amorcée à aujourd'hui par défaut (paramètre optionnel).
+* ```-n nbJour``` précise le nombre de jour(s) à compter de la date courante. Désactivé par défaut (paramètre optionnel).
+* ```-cc callCenter``` est la référence au centre d'appel. Armorcée à Excelia par défaut (paramètre optionnel).
 * ```-client client``` est la référence au client servant à filtrer les résultats. Désactivé par défaut (paramètre optionnel).
 * ```-clientUuid uuid``` est l'identifiant unique du client servant à filtrer les résultats. Désactivé par défaut (paramètre optionnel).
 * ```-p path``` est le répertoire vers lequel exporter les fichiers contenant les résultats. Par défaut c'est le répertoire courant du programme (paramètre optionnel).
 * ```-f ficher``` est le fichier Excel qui recevra les résultats. Par défaut, c'est le fichier *Export.xlsx* (paramètre optionnel).
-* ```-s suffixe``` est le suffixe à ajouter au nom des fichiers. Par défaut il n'y a pas de suffixe (paramètre optionnel).
+* ```-s suffixe``` est le suffixe à ajouter au nom du fichier. Par défaut il n'y a pas de suffixe (paramètre optionnel).
 * ```-d``` le programme s'exécute en mode débug, il est beaucoup plus verbeux. Désactivé par défaut (paramètre optionnel).
 * ```-t``` le programme s'exécute en mode test, les transactions en base de données ne sont pas faites. Désactivé par défaut (paramètre optionnel).
 

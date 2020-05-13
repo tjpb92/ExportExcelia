@@ -23,10 +23,10 @@ test.mongodb.passwd=passwd
 test.mongodb.database=db
 
 # Mailserver
-mailServer.name=Serveur de messagerie
-mailServer.host=1.2.3.4
-mailServer.port=25
-mailServer.username=user
-mailServer.passwd=password
-mailServer.fromAddress=emetteur@domain.com
-mailServer.toAddress=destinataire@destination.com
+prod.mail.name=Serveur de messagerie
+prod.mail.host=1.2.3.4
+prod.mail.port=25
+prod.mail.username=user
+prod.mail.passwd=password
+prod.mail.fromAddress=emetteur@domain.com
+prod.mail.toAddress=destinataire@destination.com
