@@ -2,9 +2,8 @@ package com.anstel.libutilsscala
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
 import scala.util.{Failure, Success, Try}
-
+import com.anstel.libutilsscala.ApplicationParameters._
 /**
  * Classe définissant l'objet ApplicationParameters
  * Récupère les paramètres en ligne de commune
@@ -22,34 +21,33 @@ import scala.util.{Failure, Success, Try}
  * @param debugMode  : le programme s'exécute en mode débug, il est beaucoup plus verbeux. Désactivé par défaut (paramètre optionnel).
  * @param testMode   : le programme s'exécute en mode test, les transactions en base de données ne sont pas faites. Désactivé par défaut (paramètre optionnel).
  * @author Thierry Baribaud
- * @version 1.01
+ * @version 1.02
  */
-case class ApplicationParameters(db: String = ApplicationParameters.DEFAULT_DB,
-                                 begDate: LocalDate = ApplicationParameters.DEFAULT_BEGDATE,
-                                 endDate: LocalDate = ApplicationParameters.DEFAULT_ENDDATE,
+case class ApplicationParameters(db: String = DEFAULT_DB,
+                                 begDate: LocalDate = DEFAULT_BEGDATE, endDate: LocalDate = DEFAULT_ENDDATE,
                                  nbDay: Option[Int],
-                                 callCenter: String = ApplicationParameters.DEFAULT_CALL_CENTER,
-                                 client: Option[String],
-                                 clientUuid: Option[String],
-                                 path: String = ApplicationParameters.DEFAULT_PATH,
-                                 filename: String = ApplicationParameters.DEFAULT_FILENAME,
-                                 suffix: Option[String],
-                                 debugMode: Boolean = ApplicationParameters.DEFAULT_DEBUG_MODE,
-                                 testMode: Boolean = ApplicationParameters.DEFAULT_TEST_MODE)
+                                 callCenter: String = DEFAULT_CALL_CENTER,
+                                 client: Option[String], clientUuid: Option[String],
+                                 path: String = DEFAULT_PATH, filename: String = DEFAULT_FILENAME, suffix: Option[String],
+                                 debugMode: Boolean = DEFAULT_DEBUG_MODE, testMode: Boolean = DEFAULT_TEST_MODE)
 
 object ApplicationParameters {
 
-  // Valeurs par défaut pour les attributs
+  /**
+   * Valeurs par défaut pour les attributs
+   */
   val DEFAULT_DB = "dev"
-  val DEFAULT_ENDDATE = LocalDate.now()
-  val DEFAULT_BEGDATE = DEFAULT_ENDDATE.minusDays(7)
+  val DEFAULT_ENDDATE: LocalDate = LocalDate.now()
+  val DEFAULT_BEGDATE: LocalDate = DEFAULT_ENDDATE.minusDays(7)
   val DEFAULT_CALL_CENTER = "Excelia"
   val DEFAULT_PATH = "."
   val DEFAULT_FILENAME = "Extract.xlsx"
   val DEFAULT_DEBUG_MODE = false
   val DEFAULT_TEST_MODE = false
 
-  // Formatage des dates
+  /**
+   * Formatage des dates
+   */
   val ddmmyyyyFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
   /**
@@ -73,18 +71,16 @@ object ApplicationParameters {
       suffix <- getStringParameter("-s", args)
       debugMode <- getBooleanParameter("-d", args)
       testMode <- getBooleanParameter("-t", args)
-    } yield ApplicationParameters(db.getOrElse(DEFAULT_DB), begDate.getOrElse(DEFAULT_BEGDATE),
-      endDate.getOrElse(DEFAULT_ENDDATE),
-      nbDay, callCenter.getOrElse(DEFAULT_CALL_CENTER),
-      client, clientUuid,
-      path.getOrElse(DEFAULT_PATH), filename.getOrElse(DEFAULT_FILENAME), suffix,
-      debugMode.getOrElse(DEFAULT_DEBUG_MODE), testMode.getOrElse(DEFAULT_TEST_MODE))
-    val validatedResult = validate(result)
-    validatedResult match {
-      case Left(value) => usage()
-      case Right(value) => println(s"${value} lus.")
+      applicationParameters <- checkAndCreate(db, begDate, endDate, nbDay, callCenter, client, clientUuid, path, filename, suffix,
+        debugMode, testMode)
+    } yield applicationParameters
+    result match {
+      case Left(value) =>
+        println(value)
+        usage()
+      case Right(value) => println(s"""$value lus.""")
     }
-    validatedResult
+    result
   }
 
   /**
@@ -107,7 +103,8 @@ object ApplicationParameters {
     val ip1 = i + 1
 
     if (i == -1) Right(None)
-    else if (ip1 >= args.length || isSwitch(args(ip1))) Left(s"ERREUR : paramètre $parameter n'est pas défini")
+    else if (ip1 >= args.length) Left(s"ERREUR : paramètre $parameter n'est pas défini")
+    else if (isSwitch(args(ip1))) Left(s"ERREUR : paramètre $parameter n'est pas défini (commutateur à la place)")
     else Right(Some(args(ip1)))
   }
 
@@ -123,7 +120,8 @@ object ApplicationParameters {
     val ip1 = i + 1
 
     if (i == -1) Right(None)
-    else if (ip1 >= args.length || isSwitch(args(ip1))) Left(s"ERREUR : paramètre $parameter n'est pas défini")
+    else if (ip1 >= args.length) Left(s"ERREUR : paramètre $parameter n'est pas défini")
+    else if (isSwitch(args(ip1))) Left(s"ERREUR : paramètre $parameter n'est pas défini (commutateur à la place)")
     else {
       Try(Integer.parseInt(args(ip1))) match {
         case Failure(exception) => Left(s"ERREUR : la valeur '${args(ip1)}' du paramètre $parameter n'est pas numérique")
@@ -144,7 +142,8 @@ object ApplicationParameters {
     val ip1 = i + 1
 
     if (i == -1) Right(None)
-    else if (ip1 >= args.length || isSwitch(args(ip1))) Left(s"ERREUR : paramètre $parameter n'est pas défini")
+    else if (ip1 >= args.length) Left(s"ERREUR : paramètre $parameter n'est pas défini")
+    else if (isSwitch(args(ip1))) Left(s"ERREUR : paramètre $parameter n'est pas défini (commutateur à la place)")
     else {
       Try(LocalDate.parse(args(ip1), ddmmyyyyFormat)) match {
         case Failure(exception) => Left(s"ERREUR : la valeur '${args(ip1)}' du paramètre $parameter n'est pas une date")
@@ -167,21 +166,61 @@ object ApplicationParameters {
     else Right(Some(true))
   }
 
+  def checkAndCreate(db: Option[String], begDate: Option[LocalDate], endDate: Option[LocalDate], nbDay: Option[Int],
+                     callCenter: Option[String], client: Option[String], clientUuid: Option[String],
+                     path: Option[String], filename: Option[String], suffix: Option[String],
+                     debugMode: Option[Boolean], testMode: Option[Boolean]) : Either[String, ApplicationParameters] = for {
+    checkedDb <- Right(db.getOrElse(DEFAULT_DB))
+    checkedBegDate <- Right(begDate.getOrElse(DEFAULT_BEGDATE))
+    checkedEndDate <- Right(endDate.getOrElse(DEFAULT_ENDDATE))
+    checkedNbDay <- Right(nbDay)
+    checkedCallCenter <- Right(callCenter.getOrElse(DEFAULT_CALL_CENTER))
+    checkedClient <- Right(client)
+    checkedClientUuid <- Right(clientUuid)
+    checkedPath <- Right(path.getOrElse(DEFAULT_PATH))
+    checkedFilename <- Right(filename.getOrElse(DEFAULT_FILENAME))
+    checkedSuffix <- Right(suffix)
+    checkedDebugMode <- Right(debugMode.getOrElse(DEFAULT_DEBUG_MODE))
+    checkedTestMode <- Right(testMode.getOrElse(DEFAULT_TEST_MODE))
+    checkedDatesFilter <- checkDatesFilter(checkedBegDate, checkedEndDate)
+    checkedClientFilter <- checkClientFilter(checkedClient, checkedClientUuid)
+    checkedClientDatesSelector <- checkDatesSelector(begDate, endDate, nbDay)
+  } yield ApplicationParameters(checkedDb, checkedBegDate, checkedEndDate, checkedNbDay, checkedCallCenter ,
+    checkedClient, checkedClientUuid, checkedPath, checkedFilename, checkedSuffix, checkedDebugMode, checkedTestMode)
+
   /**
-   * Valide la bonne construction de l'objet ApplicationParameters
-   *
-   * @param applicationParameters : paramètres de l'application
-   * @return les paramètres de l'application ou un message d'erreur
+   * Vérifie que la date de début est antérieure à la date de fin
+   * @param begDate : date de début
+   * @param endDate : date de fin
+   * @return condition vérifiée (true) ou un message d'erreur
    */
-  def validate(applicationParameters: Either[String, ApplicationParameters]): Either[String, ApplicationParameters] = {
-    val result = applicationParameters match {
-      case Right(value) => value
-    }
-    if (result.begDate.isAfter(result.endDate))
-      Left(s"ERREUR : La date de début ${ddmmyyyyFormat.format(result.begDate)} doit être antérieure à la date de fin ${ddmmyyyyFormat.format(result.endDate)}")
-    else
-      applicationParameters
-  }
+  def checkDatesFilter(begDate: LocalDate, endDate: LocalDate): Either[String, Boolean] =
+    if (begDate.isAfter(endDate))
+      Left(s"ERREUR : La date de début ${ddmmyyyyFormat.format(begDate)} doit être antérieure à la date de fin ${ddmmyyyyFormat.format(endDate)}")
+    else Right(true)
+
+  /**
+   * Vérifie la non utilisation conjointe des options -client et -clientUuid :
+   *
+   * @param client     : le nom du client
+   * @param clientUuid : l'identifiant unique du client
+   * @return condition vérifiée (true) ou un message d'erreur
+   */
+  def checkClientFilter(client: Option[String], clientUuid: Option[String]): Either[String, Boolean] =
+    if (client.isEmpty || clientUuid.isEmpty) Right(true)
+    else Left("Erreur : ne pas utiliser -client et -clientUuid en même temps")
+
+  /**
+   * Vérifie la non utilisation conjointe des options -n avec -b ou -e
+   * @param begDate : date de début
+   * @param endDate : date de fin
+   * @param nbDay   : nombre de jours par rapport à aujourd'hui
+   * @return condition vérifiée (true) ou un message d'erreur
+   */
+  def checkDatesSelector(begDate: Option[LocalDate], endDate: Option[LocalDate], nbDay:Option[Int]): Either[String, Boolean] =
+    if ((begDate.isDefined || endDate.isDefined) && nbDay.isDefined)
+      Left("Erreur : ne pas utiliser -n en même temps que -b ou -e")
+    else Right(true)
 
   /**
    * Affiche les paramètres en ligne de commande autorisés
@@ -191,4 +230,3 @@ object ApplicationParameters {
   }
 
 }
-

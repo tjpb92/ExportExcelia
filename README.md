@@ -1,5 +1,5 @@
-# Programme Scala pour exporter des données d'une base MongoDB vers des fichiers Excel
-Programme Scala pour exporter des données d'une base MongoDB vers des fichiers Excel
+# Programme Scala pour exporter des données d'une base MongoDB vers un fichier Excel
+Programme Scala pour exporter des données d'une base MongoDB vers un fichier Excel
 
 ## Utilisation:
 ```
