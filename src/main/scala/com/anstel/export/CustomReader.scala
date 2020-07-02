@@ -119,9 +119,9 @@ object CustomReader {
     implicit object RequestReader extends BSONDocumentReader[Request] {
       def read(doc: BSONDocument): Request = {
         val uid = doc.getAs[String]("uid").getOrElse("non renseigné")
-        val requestDate = doc.getAs[String]("requestDate").get
-        val requesterName = doc.getAs[Requester]("requester").get
-        val patrimony = doc.getAs[List[Patrimony]]("patrimony").get
+        val requestDate = doc.getAs[String]("requestDate").getOrElse("non renseigné")
+        val requesterName = doc.getAs[Requester]("requester").getOrElse(Requester("non renseigné"))
+        val patrimony = doc.getAs[List[Patrimony]]("patrimony").getOrElse(List(Patrimony("non renseigné", "non renseigné", "non renseigné", List("non renseigné"), Company("non renseigné", "non renseigné", "non renseigné"), List(Agency("non renseigné", "non renseigné")))))
 
         Request(uid, requestDate, requesterName, patrimony)
       }
@@ -189,9 +189,9 @@ object CustomReader {
     implicit object TicketsOpenedFromSimplifiedRequestReader extends BSONDocumentReader[TicketsOpenedFromSimplifiedRequest] {
       def read(doc: BSONDocument): TicketsOpenedFromSimplifiedRequest = {
         val uid = doc.getAs[String]("uid").getOrElse("non renseigné")
-        val created = doc.getAs[BSONDateTime]("created").get
-        val agency = doc.getAs[Agency]("firstAgency").get
-        val poorRequest = doc.getAs[PoorRequest]("request").get
+        val created = doc.getAs[BSONDateTime]("created").getOrElse(BSONDateTime(0L))
+        val agency = doc.getAs[Agency]("firstAgency").getOrElse(Agency("non, renseigné", "non renseigné"))
+        val poorRequest = doc.getAs[PoorRequest]("request").getOrElse(PoorRequest("non renseigné", "non renseigné"))
         val user = doc.getAs[User]("user").getOrElse(User("non renseigné", "non renseigné", "non renseigné", "non renseigné"))
 
         val createdParsed: String = created match {
@@ -232,7 +232,7 @@ object CustomReader {
     implicit object UsersFromTicketsReader extends BSONDocumentReader[UsersFromTickets] {
       def read(doc: BSONDocument): UsersFromTickets = {
         val user = doc.getAs[User]("user").getOrElse(User("non renseigné", "non renseigné", "non renseigné", "non renseigné"))
-        val agency = doc.getAs[Agency]("firstAgency").get
+        val agency = doc.getAs[Agency]("firstAgency").getOrElse(Agency("non renseigné", "non renseigné"))
 
         UsersFromTickets(user, agency)
 

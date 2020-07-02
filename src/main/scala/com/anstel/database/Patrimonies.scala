@@ -20,7 +20,7 @@ object Patrimonies extends Models {
 
   /**
    * @param connection
-   * @param applicationParameters
+   * @param dbServer
    * @return scala future résolu à un object BSONCollection provenant de reactivemongo
    */
   def getCollection(connection: MongoConnection, dbServer: DbServer): Future[BSONCollection] =
