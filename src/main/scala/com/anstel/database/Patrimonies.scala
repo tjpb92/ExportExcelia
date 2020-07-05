@@ -39,6 +39,9 @@ object Patrimonies extends Models {
 
     val query = BSONDocument(
       "$and" -> BSONArray (
+        BSONDocument("callCenterReferences" -> BSONDocument(
+          "$eq" -> applicationParameters.callCenter
+        )),
         BSONDocument("complementaryAddresses" -> BSONDocument(
           "$not" -> BSONDocument(
             "$elemMatch" -> BSONDocument(

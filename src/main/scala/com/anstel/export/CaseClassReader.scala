@@ -16,7 +16,7 @@ object CaseClassReader {
    * @return List avec les valeurs du CustomReader passer en paramétre + les titres
    */
   def patrimonyReader(patrimonies: List[Patrimony]): List[List[String]] = {
-    println("reading patrimony")
+    val sheetName: List[String] = List("patrimony")
     val headers: List[String] = List("uid", "ref", "label", "callCenterReference", "company.uid", "company.name", "agency.uid", "agency.name")
     val values = patrimonies.map {
       patrimony => List(
@@ -29,7 +29,7 @@ object CaseClassReader {
         patrimony.agency.head.uid,
         patrimony.agency.head.name)
     }
-    headers :: values
+    sheetName :: headers :: values
   }
 
 
@@ -39,14 +39,15 @@ object CaseClassReader {
    * @return List avec les valeurs du CustomReader passer en paramétre + les titres
    */
   def requestReader(requests: List[Request]): List[List[String]] = {
+    val sheetName: List[String] = List("request")
     val headers: List[String] = List("uid", "requestDate", "requester.name", "patrimony.uid", "patrimony.ref", "patrimony.label", "callCenterReference", "company.uid", "company.name", "agency.uid", "agency.name")
     val values = requests.map {
       request => List(
         request.uid,
         request.requestDate,
-        request.requester.name) ++ patrimonyReader(request.patrimony).tail.head
+        request.requester.name) ++ patrimonyReader(request.patrimony).tail.tail.head
     }
-    headers :: values
+    sheetName :: headers :: values
   }
 
   /**
@@ -54,6 +55,7 @@ object CaseClassReader {
    * @return List avec les valeurs du CustomReader passer en paramétre + les titres
    */
   def TicketsOpenedFromSimplifiedRequestReader(tickets: List[TicketsOpenedFromSimplifiedRequest]): List[List[String]] = {
+    val sheetName: List[String] = List("tickets")
     val headers: List[String] = List(
       "uid",
       "user.uid",
@@ -84,7 +86,7 @@ object CaseClassReader {
       )
     }
 
-    headers :: values
+    sheetName :: headers :: values
 
   }
 
@@ -93,6 +95,7 @@ object CaseClassReader {
    * @return List avec les valeurs du CustomReader passer en paramétre + les titres
    */
   def UsersFromTicketsReader(users: List[UsersFromTickets]): List[List[String]] = {
+    val sheetName: List[String] = List("users")
     val headers: List[String] = List(
       "user.uid",
       "user.firstName",
@@ -112,7 +115,7 @@ object CaseClassReader {
       )
     }
 
-    headers :: mapToList(mapOfTicketCount(values))
+    sheetName :: headers :: mapToList(mapOfTicketCount(values))
 
   }
 

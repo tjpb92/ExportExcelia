@@ -39,7 +39,7 @@ object ApplicationParameters {
   val DEFAULT_DB = "dev"
   val DEFAULT_ENDDATE: LocalDate = LocalDate.now()
   val DEFAULT_BEGDATE: LocalDate = DEFAULT_ENDDATE.minusDays(7)
-  val DEFAULT_CALL_CENTER = "Excelia"
+  val DEFAULT_CALL_CENTER = "8a8a2283-0ef1-4755-b398-8ae7880766e5"  //"Excelia"
   val DEFAULT_PATH = "."
   val DEFAULT_FILENAME = "Extract.xlsx"
   val DEFAULT_DEBUG_MODE = false

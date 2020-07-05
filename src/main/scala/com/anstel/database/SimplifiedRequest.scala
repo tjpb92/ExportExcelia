@@ -5,7 +5,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import reactivemongo.api.{Cursor, MongoConnection}
 import reactivemongo.api.bson.collection.BSONCollection
-import reactivemongo.bson.BSONDocument
+import reactivemongo.bson.{BSONDocument, BSONArray}
 
 import com.anstel.export.CustomReader.Request
 import com.anstel.libutilsscala.{DbServer, ApplicationParameters}
@@ -41,9 +41,16 @@ object SimplifiedRequest extends Models {
 
     val query = collection.aggregatorContext[Request](
       Match(BSONDocument(
-        "requestDate" -> BSONDocument(
-          "$gte" -> applicationParameters.begDate.toString(),
-          "$lt" -> applicationParameters.endDate.toString()
+        "$and" -> BSONArray(
+          BSONDocument("linkedEntities.callCenters" -> BSONDocument(
+            "$eq" -> applicationParameters.callCenter
+          )),
+          BSONDocument(
+            "requestDate" -> BSONDocument(
+              "$gte" -> applicationParameters.begDate.toString(),
+              "$lt" -> applicationParameters.endDate.toString()
+            )
+          )
         )
       )),
       List(

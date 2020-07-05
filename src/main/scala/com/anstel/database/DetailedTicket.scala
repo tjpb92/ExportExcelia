@@ -43,13 +43,18 @@ object DetailedTicket extends Models {
     val query = collection.aggregatorContext[TicketsOpenedFromSimplifiedRequest](
       Match(BSONDocument(
        "$and" -> BSONArray(
+         BSONDocument("linkedEntities.callCenterReferences" -> BSONDocument(
+           "$eq" -> applicationParameters.callCenter
+         )),
          BSONDocument("openedFromSimplifiedRequest" -> BSONDocument(
            "$exists" -> true
          )),
-         BSONDocument("created" -> BSONDocument(
-           "$gte" -> applicationParameters.begDate,
-           "$lt" -> applicationParameters.endDate
-         ))
+         BSONDocument(
+           "created" -> BSONDocument(
+             "$gte" -> applicationParameters.begDate,
+             "$lt" -> applicationParameters.endDate
+           )
+         )
        )
       )),
       List(
@@ -95,9 +100,18 @@ object DetailedTicket extends Models {
 
     val query = collection.aggregatorContext[UsersFromTickets](
       Match(BSONDocument(
-        BSONDocument("openedFromSimplifiedRequest" -> BSONDocument(
-          "$exists" -> true
-        ))
+        "$and" -> BSONArray(
+          BSONDocument("linkedEntities.callCenterReferences" -> BSONDocument(
+            "$eq" -> applicationParameters.callCenter
+          )),
+          BSONDocument("openedFromSimplifiedRequest" -> BSONDocument(
+            "$exists" -> true
+          )),
+          BSONDocument("created" -> BSONDocument(
+            "$gte" -> applicationParameters.begDate,
+            "$lt" -> applicationParameters.endDate
+          ))
+        )
       )),
       List(
         AddFields(document("firstEvent" -> document(f"$$arrayElemAt" -> array(f"$$journal", 0)))),
