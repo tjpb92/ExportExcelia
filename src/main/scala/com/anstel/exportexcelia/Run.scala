@@ -76,6 +76,8 @@ object Run {
           case Success(collection) => {
             query(collection, applicationParameters).onComplete {
               case Success(data) => {
+                println(s"recuperation des donnes associees a $caseClassReader")
+                println(s"${data.length} resultat ajoute au buffer")
                 aggregator.setFiles(caseClassReader(data))
               }
               case Failure(f) => println("FAILURE" + f.getMessage())
@@ -87,6 +89,5 @@ object Run {
       case Failure(f) => println("FAILURE" + f.getMessage())
     }
   }
-
 
 }

@@ -34,6 +34,7 @@ object ExcelWriter {
     val workbook: XSSFWorkbook = new XSSFWorkbook()
 
     for (file <- files) {
+      println(s"Ajout de la feuille de calcule ${file.head.head}")
       val sheet: Sheet = workbook.createSheet(file.head.head)
 
       // Create a Font for styling header cells
@@ -68,8 +69,10 @@ object ExcelWriter {
         sheet.autoSizeColumn(i)
       }
 
-      // Write the output to a file// Write the output to a file
+
     }
+
+    // Write the output to a file// Write the output to a file
     val fileOut: FileOutputStream = new FileOutputStream(new File(applicationParameters.path + "/" + applicationParameters.filename))
     workbook.write(fileOut)
     fileOut.close()
