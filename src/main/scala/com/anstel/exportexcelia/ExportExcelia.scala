@@ -1,13 +1,10 @@
 package com.anstel.exportexcelia
 
-
-
-
-
 import com.anstel.libutilsscala.{ApplicationParameters, ApplicationProperties, DbServer, MailServer}
 
-
-
+/**
+ * Point d'entré du programme
+ */
 object ExportExcelia extends App {
 
   val applicationProperties = new ApplicationProperties("ExportExcelia.prop")
@@ -27,6 +24,7 @@ object ExportExcelia extends App {
         r._1,
         r._2
       )
+      System.exit(0)
     }
   }
 

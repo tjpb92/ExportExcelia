@@ -11,3 +11,5 @@ libraryDependencies ++= Seq(
   "org.scalactic" %% "scalactic" % "3.1.2",
   "org.scalatest" %% "scalatest" % "3.1.2" % "test"
 )
+
+fork in run := true

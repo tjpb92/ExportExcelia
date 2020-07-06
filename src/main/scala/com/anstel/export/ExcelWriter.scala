@@ -68,9 +68,9 @@ object ExcelWriter {
       for (i <- 0 until file.length) {
         sheet.autoSizeColumn(i)
       }
-
-
     }
+
+    println("Fichier créé")
 
     // Write the output to a file// Write the output to a file
     val fileOut: FileOutputStream = new FileOutputStream(new File(applicationParameters.path + "/" + applicationParameters.filename))
