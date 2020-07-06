@@ -43,7 +43,7 @@ object DetailedTicket extends Models {
     val query = collection.aggregatorContext[TicketsOpenedFromSimplifiedRequest](
       Match(BSONDocument(
        "$and" -> BSONArray(
-         BSONDocument("linkedEntities.callCenterReferences" -> BSONDocument(
+         BSONDocument("callCenterReferences" -> BSONDocument(
            "$eq" -> applicationParameters.callCenter
          )),
          BSONDocument("openedFromSimplifiedRequest" -> BSONDocument(
@@ -59,7 +59,7 @@ object DetailedTicket extends Models {
       )),
       List(
         AddFields(document("firstEvent" -> document(f"$$arrayElemAt" -> array(f"$$journal", 0)))),
-        AddFields(document("firstAgency" -> document(f"$$arrayElemAt" -> array(f"$$linkedEntities.agencies", 0)))),
+        AddFields(document("firstAgency" -> document(f"$$arrayElemAt" -> array(f"$$agencies", 0)))),
         Lookup("simplifiedRequest", "openedFromSimplifiedRequest", "uid", "request"),
         Unwind("request", Option("SimplifiedRequestIndex"), Option(true)),
         Lookup("users", "firstEvent.operator.userUid", "uid", "user"),
@@ -101,7 +101,7 @@ object DetailedTicket extends Models {
     val query = collection.aggregatorContext[UsersFromTickets](
       Match(BSONDocument(
         "$and" -> BSONArray(
-          BSONDocument("linkedEntities.callCenterReferences" -> BSONDocument(
+          BSONDocument("callCenterReferences" -> BSONDocument(
             "$eq" -> applicationParameters.callCenter
           )),
           BSONDocument("openedFromSimplifiedRequest" -> BSONDocument(
@@ -115,7 +115,7 @@ object DetailedTicket extends Models {
       )),
       List(
         AddFields(document("firstEvent" -> document(f"$$arrayElemAt" -> array(f"$$journal", 0)))),
-        AddFields(document("firstAgency" -> document(f"$$arrayElemAt" -> array(f"$$linkedEntities.agencies", 0)))),
+        AddFields(document("firstAgency" -> document(f"$$arrayElemAt" -> array(f"$$agencies", 0)))),
         Lookup("users", "firstEvent.operator.userUid", "uid", "user"),
         Unwind("user", Option("userIndex"), Option(true)),
         Project(BSONDocument(

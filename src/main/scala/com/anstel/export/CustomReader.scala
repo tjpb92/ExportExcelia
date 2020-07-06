@@ -198,7 +198,7 @@ object CustomReader {
           case BSONDateTime(value) => Instant.ofEpochMilli(value).toString()
         }
 
-        // Calcul de la différence de temps entre le requéte et le ticket
+        // Calcul de la différence de temps entre la requete et le ticket
 
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 
