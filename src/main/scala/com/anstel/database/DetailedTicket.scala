@@ -78,6 +78,7 @@ object DetailedTicket extends Models {
           "user.uid" -> 1,
           "user.firstName" -> 1,
           "user.lastName" -> 1,
+          "user.job" -> 1,
           "user.userType" -> 1,
         ))
       )

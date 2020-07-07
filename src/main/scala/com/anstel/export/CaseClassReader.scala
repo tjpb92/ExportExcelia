@@ -61,6 +61,7 @@ object CaseClassReader {
       "user.uid",
       "user.firstName",
       "user.lastName",
+      "user.job",
       "created",
       "agency.uid",
       "agency.name",
@@ -76,6 +77,7 @@ object CaseClassReader {
         ticketsOpenedFromSimplifiedRequest.user.uid,
         ticketsOpenedFromSimplifiedRequest.user.firstName,
         ticketsOpenedFromSimplifiedRequest.user.lastName,
+        ticketsOpenedFromSimplifiedRequest.user.job,
         ticketsOpenedFromSimplifiedRequest.created,
         ticketsOpenedFromSimplifiedRequest.agency.uid,
         ticketsOpenedFromSimplifiedRequest.agency.name,
@@ -100,6 +102,7 @@ object CaseClassReader {
       "user.uid",
       "user.firstName",
       "user.lastName",
+      "user.job",
       "agency.uid",
       "agency.name",
       "ticketCount"
@@ -110,6 +113,7 @@ object CaseClassReader {
         ticketCount.user.uid,
         ticketCount.user.firstName,
         ticketCount.user.lastName,
+        ticketCount.user.job,
         ticketCount.agency.uid,
         ticketCount.agency.name,
       )

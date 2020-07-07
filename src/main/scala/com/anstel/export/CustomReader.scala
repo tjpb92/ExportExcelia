@@ -10,14 +10,21 @@ import reactivemongo.bson.{BSONDateTime, BSONDocument, BSONDocumentReader}
  * Objet qui regroupe les CustomReader utilisé par les modéles pour renvoyer les résultats des requétes
  *
  * @author William Machi
- *  @version 1.0
+ * @version 1.0
  */
 object CustomReader {
 
   /**
    * Class abstraite pour pour conformer le type des CustomReader
    */
-  abstract class AbstractCustomReader
+  abstract class AbstractCustomReader /*{
+    var counter = 0
+    //def name: String
+    def count(): Unit = {
+      counter += 1
+      if(counter <= 10 || counter % 100 == 0) println(s"$counter ${this.getClass.getName} créé")
+    }
+  }*/
 
   /**
    * CustomReader pour le champ Company
@@ -157,7 +164,7 @@ object CustomReader {
    * @param lastName
    * @param userType
    */
-  case class User(uid: String, firstName: String, lastName: String, userType: String)
+  case class User(uid: String, firstName: String, lastName: String, job: String)
 
   object User {
     implicit object UserReader extends BSONDocumentReader[User] {
@@ -165,9 +172,9 @@ object CustomReader {
         val uid = doc.getAs[String]("uid").getOrElse("non renseigné")
         val firstName = doc.getAs[String]("firstName").getOrElse("non renseigné")
         val lastName = doc.getAs[String]("lastName").getOrElse("non renseigné")
-        val userType = doc.getAs[String]("userType").getOrElse("non renseigné")
+        val job = doc.getAs[String]("job").getOrElse(doc.getAs[String]("userType").getOrElse("non renseigné"))
 
-        User(uid, firstName, lastName, userType)
+        User(uid, firstName, lastName, job)
       }
     }
   }
