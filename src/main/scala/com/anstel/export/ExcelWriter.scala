@@ -34,7 +34,10 @@ object ExcelWriter {
     val workbook: XSSFWorkbook = new XSSFWorkbook()
 
     for (file <- files) {
-      println(s"Ajout de la feuille de calcule ${file.head.head}")
+      if(applicationParameters.debugMode) {
+        println(s"Ajout de la feuille de calcule ${file.head.head}")
+      }
+
       val sheet: Sheet = workbook.createSheet(file.head.head)
 
       // Create a Font for styling header cells

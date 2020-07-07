@@ -1,6 +1,7 @@
 package com.anstel.export
 
 import com.anstel.export.CustomReader.{Patrimony, Request, TicketsOpenedFromSimplifiedRequest, UsersFromTickets}
+import com.anstel.libutilsscala.ApplicationParameters
 
 /**
  * Objet qui regroupe les fonctions pour transformer les listes de CustomReader renvoyer par les modéle en liste de liste de string
@@ -15,9 +16,14 @@ object CaseClassReader {
    * @param patrimonies: List[CustomReader]
    * @return List avec les valeurs du CustomReader passer en paramétre + les titres
    */
-  def patrimonyReader(patrimonies: List[Patrimony]): List[List[String]] = {
+  def patrimonyReader(patrimonies: List[Patrimony], applicationParameters: ApplicationParameters): List[List[String]] = {
     val sheetName: List[String] = List("patrimony")
-    val headers: List[String] = List("uid", "ref", "label", "callCenterReference", "company.uid", "company.name", "agency.uid", "agency.name")
+
+    val headers: List[String] = applicationParameters.debugMode match {
+      case true => List("uid", "ref", "label", "callCenterReference", "company.uid", "company.name", "agency.uid", "agency.name")
+      case false => List("uid", "ref", "label", "callCenterReference", "company.uid", "company.name", "agency.uid", "agency.name")
+    }
+
     val values = patrimonies.map {
       patrimony => List(
         patrimony.uid,
@@ -38,14 +44,43 @@ object CaseClassReader {
    * @param requests: List[CustomReader]
    * @return List avec les valeurs du CustomReader passer en paramétre + les titres
    */
-  def requestReader(requests: List[Request]): List[List[String]] = {
+  def requestReader(requests: List[Request], applicationParameters: ApplicationParameters): List[List[String]] = {
     val sheetName: List[String] = List("request")
-    val headers: List[String] = List("uid", "requestDate", "requester.name", "patrimony.uid", "patrimony.ref", "patrimony.label", "callCenterReference", "company.uid", "company.name", "agency.uid", "agency.name")
+
+    val headers: List[String] = applicationParameters.debugMode match {
+      case true => List(
+        "uid",
+        "requestDate",
+        "requester.name",
+        "patrimony.uid",
+        "patrimony.ref",
+        "patrimony.label",
+        "callCenterReference",
+        "company.uid",
+        "company.name",
+        "agency.uid",
+        "agency.name"
+      )
+      case false => List(
+        "uid",
+        "requestDate",
+        "requester.name",
+        "patrimony.uid",
+        "patrimony.ref",
+        "patrimony.label",
+        "callCenterReference",
+        "company.uid",
+        "company.name",
+        "agency.uid",
+        "agency.name"
+      )
+    }
+
     val values = requests.map {
       request => List(
         request.uid,
         request.requestDate,
-        request.requester.name) ++ patrimonyReader(request.patrimony).tail.tail.head
+        request.requester.name) ++ patrimonyReader(request.patrimony, applicationParameters).tail.tail.head
     }
     sheetName :: headers :: values
   }
@@ -54,22 +89,39 @@ object CaseClassReader {
    * @param tickets: List[CustomReader]
    * @return List avec les valeurs du CustomReader passer en paramétre + les titres
    */
-  def TicketsOpenedFromSimplifiedRequestReader(tickets: List[TicketsOpenedFromSimplifiedRequest]): List[List[String]] = {
+  def TicketsOpenedFromSimplifiedRequestReader(tickets: List[TicketsOpenedFromSimplifiedRequest], applicationParameters: ApplicationParameters): List[List[String]] = {
     val sheetName: List[String] = List("tickets")
-    val headers: List[String] = List(
-      "uid",
-      "user.uid",
-      "user.firstName",
-      "user.lastName",
-      "user.job",
-      "created",
-      "agency.uid",
-      "agency.name",
-      "poorRequest.uid",
-      "poorRequest.requestDate",
-      "parsedTimeDifference",
-      "timeDifferenceInSeconds"
-    )
+
+    val headers: List[String] = applicationParameters.debugMode match {
+      case true => List(
+        "uid",
+        "user.uid",
+        "user.firstName",
+        "user.lastName",
+        "user.job",
+        "created",
+        "agency.uid",
+        "agency.name",
+        "poorRequest.uid",
+        "poorRequest.requestDate",
+        "parsedTimeDifference",
+        "timeDifferenceInSeconds"
+      )
+      case false => List(
+        "uid",
+        "user.uid",
+        "user.firstName",
+        "user.lastName",
+        "user.job",
+        "created",
+        "agency.uid",
+        "agency.name",
+        "Request.uid",
+        "Request.requestDate",
+        "parsedTimeDifference",
+        "timeDifferenceInSeconds"
+      )
+    }
 
     val values = tickets.map {
       ticketsOpenedFromSimplifiedRequest => List(
@@ -96,17 +148,29 @@ object CaseClassReader {
    * @param users: List[CustomReader]
    * @return List avec les valeurs du CustomReader passer en paramétre + les titres
    */
-  def UsersFromTicketsReader(users: List[UsersFromTickets]): List[List[String]] = {
+  def UsersFromTicketsReader(users: List[UsersFromTickets], applicationParameters: ApplicationParameters): List[List[String]] = {
     val sheetName: List[String] = List("users")
-    val headers: List[String] = List(
-      "user.uid",
-      "user.firstName",
-      "user.lastName",
-      "user.job",
-      "agency.uid",
-      "agency.name",
-      "ticketCount"
-    )
+
+    val headers: List[String] = applicationParameters.debugMode match {
+      case true => List(
+        "user.uid",
+        "user.firstName",
+        "user.lastName",
+        "user.job",
+        "agency.uid",
+        "agency.name",
+        "ticketCount"
+      )
+      case false => List(
+        "user.uid",
+        "user.firstName",
+        "user.lastName",
+        "user.job",
+        "agency.uid",
+        "agency.name",
+        "ticketCount"
+      )
+    }
 
     val values = users.map {
       ticketCount => List (

@@ -67,7 +67,7 @@ object Run {
     dbServer: DbServer,
     model: Models,
     query: (BSONCollection, ApplicationParameters) => Future[List[A]],
-    caseClassReader: (List[A]) => List[List[String]]
+    caseClassReader: (List[A], ApplicationParameters) => List[List[String]]
   ) =
   {
     Connect.connection(dbServer).onComplete {
@@ -76,9 +76,11 @@ object Run {
           case Success(collection) => {
             query(collection, applicationParameters).onComplete {
               case Success(data) => {
-                println(s"recuperation des donnes associees a $caseClassReader")
-                println(s"${data.length} resultat ajoute au buffer")
-                aggregator.setFiles(caseClassReader(data))
+                if(applicationParameters.debugMode) {
+                  println(s"recuperation des donnes associees a $caseClassReader")
+                  println(s"${data.length} resultat ajoute au buffer")
+                }
+                aggregator.setFiles(caseClassReader(data, applicationParameters))
               }
               case Failure(f) => println("FAILURE" + f.getMessage())
             }
