@@ -139,7 +139,7 @@ object CaseClassReader {
    * @return List avec les valeurs du CustomReader passer en paramétre + les titres
    */
   def TicketsOpenedFromSimplifiedRequestReader(tickets: List[TicketsOpenedFromSimplifiedRequest], applicationParameters: ApplicationParameters): List[List[String]] = {
-    val sheetName: List[String] = List("tickets")
+    val sheetName: List[String] = List("temps request-tickets")
 
     val headers: List[String] = applicationParameters.debugMode match {
       case true => List(
