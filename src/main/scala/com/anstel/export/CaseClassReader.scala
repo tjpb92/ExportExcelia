@@ -125,11 +125,12 @@ object CaseClassReader {
       ) ::: userReader(nonDealtRequest.users).flatten
     }
 
-    val usersNumber: Int = ((values.length - 3) / 4) + 1
 
-    val usersHeaders: List[String] = headers ::: List.fill(usersNumber)(List("user.uid", "user.firstanme", "user.lastname", "user.job")).flatten
+    val usersNumbers: List[Int] = for(value <- values) yield (value.length - 3) / 4
 
-    //println(s"usersNumber is $usersNumber")
+    println(s"max users is ${usersNumbers.max}")
+
+    val usersHeaders: List[String] = headers ::: List.fill(usersNumbers.max)(List("user.uid", "user.firstname", "user.lastname", "user.job")).flatten
 
     sheetName :: usersHeaders :: values
   }

@@ -66,9 +66,10 @@ object ExcelWriter {
         }
       }
 
-      //Ajuste la taille des cellules le fichier construit
+      //println(file.tail.head)
 
-      for (i <- 0 until file.length) {
+      //Ajuste la taille des cellules le fichier construit
+      for (i <- 0 until file.tail.head.length) {
         sheet.autoSizeColumn(i)
       }
     }
