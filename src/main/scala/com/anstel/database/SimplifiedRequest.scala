@@ -7,7 +7,7 @@ import reactivemongo.api.{Cursor, MongoConnection}
 import reactivemongo.api.bson.collection.BSONCollection
 import reactivemongo.bson.{BSONDocument, BSONArray}
 
-import com.anstel.export.CustomReader.Request
+import com.anstel.export.CustomReader.{Request, NonDealtRequest}
 import com.anstel.libutilsscala.{DbServer, ApplicationParameters}
 
 /**
@@ -81,4 +81,47 @@ object SimplifiedRequest extends Models {
 
   }
 
+
+  def getNonDealtRequestBetween(collection: BSONCollection, applicationParameters: ApplicationParameters): Future[List[NonDealtRequest]] = {
+    import collection.aggregationFramework.{ Match, Lookup, Project, Unwind }
+
+    val query = collection.aggregatorContext[NonDealtRequest](
+      Match(BSONDocument(
+        "$and" -> BSONArray(
+          BSONDocument("linkedEntities.callCenters" -> BSONDocument(
+            "$eq" -> applicationParameters.callCenter
+          )),
+          BSONDocument(
+            "requestDate" -> BSONDocument(
+              "$gte" -> applicationParameters.begDate.toString(),
+              "$lt" -> applicationParameters.endDate.toString()
+            )
+          ),
+          BSONDocument(
+            "state" -> BSONDocument(
+              "$ne" -> "Qualified"
+            )
+          )
+        )
+      )),
+      List(
+        Lookup("users", "linkedEntities.patrimony.uid", "patrimonies", "users"),
+        //Unwind("users", Option("users"), Option(true)),
+        Project(BSONDocument(
+          // REQUEST
+          "_id" -> 0,
+          "uid" ->  1,
+          "requestDate" -> 1,
+          "state" -> 1,
+          "requester.name" -> 1,
+          // USERS
+          "users" -> 1
+        ))
+      )
+    )
+
+    query.prepared.cursor.collect[List](-1, Cursor.FailOnError[List[NonDealtRequest]]())
+  }
+
 }
+

@@ -137,6 +137,45 @@ object CustomReader {
 
 
   /**
+   * CustomReader Utilisé pour lire les données de l'utilisateur qui a ouvert le ticket
+   *
+   * @param uid
+   * @param firstName
+   * @param lastName
+   * @param job
+   */
+  case class User(uid: String, firstName: String, lastName: String, job: String)
+
+  object User {
+    implicit object UserReader extends BSONDocumentReader[User] {
+      def read(doc: BSONDocument): User = {
+        val uid = doc.getAs[String]("uid").getOrElse("non renseigné")
+        val firstName = doc.getAs[String]("firstName").getOrElse("non renseigné")
+        val lastName = doc.getAs[String]("lastName").getOrElse("non renseigné")
+        val job = doc.getAs[String]("job").getOrElse(doc.getAs[String]("userType").getOrElse("non renseigné"))
+
+        User(uid, firstName, lastName, job)
+      }
+    }
+  }
+
+  case class NonDealtRequest(uid: String, requestDate: String, requester: Requester, users: List[User]) extends AbstractCustomReader
+
+  object NonDealtRequest {
+    implicit object NonDealtRequestReader extends BSONDocumentReader[NonDealtRequest] {
+      def read(doc: BSONDocument): NonDealtRequest = {
+        val uid = doc.getAs[String]("uid").getOrElse("non renseigné")
+        val requestDate = doc.getAs[String]("requestDate").getOrElse("non renseigné")
+        val requesterName = doc.getAs[Requester]("requester").getOrElse(Requester("non renseigné"))
+        val users = doc.getAs[List[User]]("users").getOrElse(List(User("non renseigné", "non renseigné", "non renseigné", "non renseigné")))
+
+        NonDealtRequest(uid, requestDate, requesterName, users)
+      }
+    }
+  }
+
+
+  /**
    * CustomReader renvoyent uniquement l'uid et la date
    * Utilisé pour calculer le temps entre la SimplifiedRequest et l'ouverture du ticket
    *
@@ -152,29 +191,6 @@ object CustomReader {
         val requestDate = doc.getAs[String]("requestDate").getOrElse("non renseigné")
 
         PoorRequest(uid, requestDate)
-      }
-    }
-  }
-
-  /**
-   * CustomReader Utilisé pour lire les données de l'utilisateur qui a ouvert le ticket
-   *
-   * @param uid
-   * @param firstName
-   * @param lastName
-   * @param userType
-   */
-  case class User(uid: String, firstName: String, lastName: String, job: String)
-
-  object User {
-    implicit object UserReader extends BSONDocumentReader[User] {
-      def read(doc: BSONDocument): User = {
-        val uid = doc.getAs[String]("uid").getOrElse("non renseigné")
-        val firstName = doc.getAs[String]("firstName").getOrElse("non renseigné")
-        val lastName = doc.getAs[String]("lastName").getOrElse("non renseigné")
-        val job = doc.getAs[String]("job").getOrElse(doc.getAs[String]("userType").getOrElse("non renseigné"))
-
-        User(uid, firstName, lastName, job)
       }
     }
   }

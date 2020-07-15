@@ -1,6 +1,6 @@
 package com.anstel.export
 
-import com.anstel.export.CustomReader.{Patrimony, Request, TicketsOpenedFromSimplifiedRequest, UsersFromTickets}
+import com.anstel.export.CustomReader.{Patrimony, Request, NonDealtRequest, TicketsOpenedFromSimplifiedRequest, UsersFromTickets, User}
 import com.anstel.libutilsscala.ApplicationParameters
 
 /**
@@ -80,9 +80,58 @@ object CaseClassReader {
       request => List(
         request.uid,
         request.requestDate,
-        request.requester.name) ++ patrimonyReader(request.patrimony, applicationParameters).tail.tail.head
+        request.requester.name) ::: patrimonyReader(request.patrimony, applicationParameters).tail.tail.head
     }
     sheetName :: headers :: values
+  }
+
+  /**
+   *
+   * @param users
+   * @return
+   */
+  def userReader(users: List[User]): List[List[String]] = {
+    for(user <- users) yield List(user.uid, user.firstName, user.lastName, user.job)
+  }
+
+
+  /**
+   *
+   * @param nonDealtRequests
+   * @param applicationParameters
+   * @return
+   */
+  def nonDealtRequestReader(nonDealtRequests: List[NonDealtRequest], applicationParameters: ApplicationParameters): List[List[String]] = {
+    val sheetName: List[String] = List("nonDealtRequest")
+
+    val headers: List[String] = applicationParameters.debugMode match {
+      case true => List(
+        "uid",
+        "requestDate",
+        "requester.name"
+      )
+      case false => List(
+        "uid",
+        "requestDate",
+        "requester.name"
+      )
+    }
+
+    val values: List[List[String]] = nonDealtRequests.map {
+      nonDealtRequest => List(
+        nonDealtRequest.uid,
+        nonDealtRequest.requestDate,
+        nonDealtRequest.requester.name
+      ) ::: userReader(nonDealtRequest.users).flatten
+    }
+
+    val usersNumber: Int = ((values.length - 3) / 4) + 1
+
+    val usersHeaders: List[String] = headers ::: List.fill(usersNumber)(List("user.uid", "user.firstanme", "user.lastname", "user.job")).flatten
+
+    //println(s"usersNumber is $usersNumber")
+
+    sheetName :: usersHeaders :: values
   }
 
   /**
@@ -148,8 +197,13 @@ object CaseClassReader {
    * @param users: List[CustomReader]
    * @return List avec les valeurs du CustomReader passer en paramétre + les titres
    */
-  def UsersFromTicketsReader(users: List[UsersFromTickets], applicationParameters: ApplicationParameters): List[List[String]] = {
-    val sheetName: List[String] = List("users")
+  def UsersFromTicketsReader(request: Boolean, users: List[UsersFromTickets], applicationParameters: ApplicationParameters): List[List[String]] = {
+    val sheetName: List[String] = request match {
+      case true =>  List("#ticket avec demande")
+      case false =>  List("#ticket sans demande")
+    }
+
+
 
     val headers: List[String] = applicationParameters.debugMode match {
       case true => List(
@@ -218,3 +272,38 @@ object CaseClassReader {
   }
 
 }
+
+/*
+val x: List[List[String]] = List(List("hello"), List("halo"), List("hola"))
+val y: List[List[String]] = List(List("one"), List("eins"), List("one"))
+
+case class User(firstname: String, lastname: String, job: String)
+case class UnHandle(uid: String, requester: String, date: String, users: List[User] )
+
+val users: List[User] = List(User("joe", "black", "manager"), User("jane", "white", "chief"), User("jack", "blue", "manager"), User("jess", "green", "assistant"))
+val requests: List[UnHandle] = List(
+  UnHandle("1", "albert", "01-02-1996", List(User("joe", "black", "manager"), User("jack", "blue", "manager"))),
+  UnHandle("2", "simone", "06-08-2012", List(User("jane", "white", "chief"))),
+  UnHandle("3", "henry", "04-06-1985", List(User("jack", "blue", "manager"))),
+  UnHandle("4", "gertrude", "10-12-2020", List(User("jess", "green", "assistant"))),
+)
+
+def breakDown(users: List[User]) = {
+  for(user <- users) yield List(user.firstname, user.lastname, user.job)
+}
+
+def read(requests: List[UnHandle]) = {
+  requests.map {
+    request => List(
+      request.uid,
+      request.requester,
+      request.date
+    ) ::: breakDown(request.users)
+  }
+}
+
+val test = read(requests)
+
+test
+
+ */
