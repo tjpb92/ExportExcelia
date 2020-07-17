@@ -8,6 +8,9 @@
 
 target
 
+*.DS_Store
+
 ExportExcelia.prop
 Extract.xlsx
+src/test/scala/com.anstel.libutilscalatest/ApplicationParametersTest.scala
 .~lock.Extract.xlsx#
