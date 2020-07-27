@@ -26,11 +26,11 @@ object ExportExcelia extends App {
         r._2
       )
       send a(new Mail (
-        from = r._3.fromAddress -> r._3.name,
-        to = Seq("wiliam.machi@asfalia.fr", "thierry.baribaud@gmail.com"),
-        subject = "Extraction Excalia",
-        message = "Ci-joint le fichier de l’extraction des données de production à date",
-        attachment = new java.io.File("./Extract.xlsx")
+        from = r._3.fromAddress -> "Sender",
+        to = r._3.toAddress.split(",").toSeq,
+        subject = "Test envoi d'extraction de dev",
+        message = s"Ci-joint le fichier de l’extraction des données de dev du ${r._1.begDate} au ${r._1.endDate}",
+        attachment = new java.io.File(s"${r._1.path}/${r._1.filename}")
       ), r._3)
     }
     System.exit(0)

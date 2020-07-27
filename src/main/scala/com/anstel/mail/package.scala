@@ -25,6 +25,7 @@ package object mail {
 
   object send {
     def a(mail: Mail, mailServer: MailServer) {
+      println("sending mail")
       import org.apache.commons.mail._
 
       val format =
@@ -61,7 +62,9 @@ package object mail {
         setFrom(mail.from._1, mail.from._2).
         setSubject(mail.subject).
         send()
+      println("mail sended")
     }
+
   }
 
 }
