@@ -9,7 +9,8 @@ libraryDependencies ++= Seq(
   "org.slf4j" % "slf4j-simple" % "1.6.4",
   "org.apache.poi" % "poi-ooxml" % "4.1.2",
   "org.scalactic" %% "scalactic" % "3.1.2",
-  "org.scalatest" %% "scalatest" % "3.1.2" % "test"
+  "org.scalatest" %% "scalatest" % "3.1.2" % "test",
+  "org.apache.commons" % "commons-email" % "1.5"
 )
 
 fork in run := true

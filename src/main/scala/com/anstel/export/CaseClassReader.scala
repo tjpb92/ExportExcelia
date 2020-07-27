@@ -128,9 +128,7 @@ object CaseClassReader {
 
     val usersNumbers: List[Int] = for(value <- values) yield (value.length - 3) / 4
 
-    println(s"max users is ${usersNumbers.max}")
-
-    val usersHeaders: List[String] = headers ::: List.fill(usersNumbers.max)(List("user.uid", "user.firstname", "user.lastname", "user.job")).flatten
+    val usersHeaders: List[String] = headers ::: List.fill(usersNumbers.maxOption.getOrElse(0))(List("user.uid", "user.firstname", "user.lastname", "user.job")).flatten
 
     sheetName :: usersHeaders :: values
   }
@@ -273,38 +271,3 @@ object CaseClassReader {
   }
 
 }
-
-/*
-val x: List[List[String]] = List(List("hello"), List("halo"), List("hola"))
-val y: List[List[String]] = List(List("one"), List("eins"), List("one"))
-
-case class User(firstname: String, lastname: String, job: String)
-case class UnHandle(uid: String, requester: String, date: String, users: List[User] )
-
-val users: List[User] = List(User("joe", "black", "manager"), User("jane", "white", "chief"), User("jack", "blue", "manager"), User("jess", "green", "assistant"))
-val requests: List[UnHandle] = List(
-  UnHandle("1", "albert", "01-02-1996", List(User("joe", "black", "manager"), User("jack", "blue", "manager"))),
-  UnHandle("2", "simone", "06-08-2012", List(User("jane", "white", "chief"))),
-  UnHandle("3", "henry", "04-06-1985", List(User("jack", "blue", "manager"))),
-  UnHandle("4", "gertrude", "10-12-2020", List(User("jess", "green", "assistant"))),
-)
-
-def breakDown(users: List[User]) = {
-  for(user <- users) yield List(user.firstname, user.lastname, user.job)
-}
-
-def read(requests: List[UnHandle]) = {
-  requests.map {
-    request => List(
-      request.uid,
-      request.requester,
-      request.date
-    ) ::: breakDown(request.users)
-  }
-}
-
-val test = read(requests)
-
-test
-
- */
