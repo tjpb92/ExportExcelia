@@ -1,5 +1,7 @@
 package com.anstel
 
+import scala.util.{Try, Success, Failure}
+
 import com.anstel.libutilsscala.MailServer
 
 package object mail {
@@ -45,24 +47,34 @@ package object mail {
         }
       }
 
-      // TODO Set authentication from your configuration, sys properties or w/e
-
-      // Can't add these via fluent API because it produces exceptions
       mail.to foreach (commonsMail.addTo(_))
       mail.cc foreach (commonsMail.addCc(_))
       mail.bcc foreach (commonsMail.addBcc(_))
 
       // CONFIG
       commonsMail.setHostName(mailServer.host)
-      commonsMail.setAuthentication(mailServer.username,mailServer.password)
-      commonsMail.setSSLOnConnect(true)
       commonsMail.setSmtpPort(mailServer.port)
 
-      commonsMail.
-        setFrom(mail.from._1, mail.from._2).
-        setSubject(mail.subject).
-        send()
-      println("mail sended")
+      mailServer.authentication match {
+        case "nossl" => commonsMail.setAuthentication(mailServer.username,mailServer.password)
+        case "ssl" => {
+          commonsMail.setAuthentication(mailServer.username,mailServer.password)
+          commonsMail.setSSLOnConnect(true)
+        }
+        case _ =>
+      }
+
+      Try {
+        commonsMail.
+          setFrom(mail.from._1, mail.from._2).
+          setSubject(mail.subject).
+          send()
+      } match {
+        case Success(i) => println("mail sended")
+        case Failure(s) => println(s"Failed. Reason: $s")
+      }
+
+
     }
 
   }

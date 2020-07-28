@@ -14,7 +14,7 @@ package com.anstel.libutilsscala
  * @version 1.01
  */
 case class MailServer(override val name: String, override val host: String, override val port: Int,
-                      override val username: String, override val password: String,
+                      authentication: String, override val username: String, override val password: String,
                       fromAddress: String, toAddress: String) extends Server (name, host, port, username, password)
 
 object MailServer {
@@ -24,11 +24,12 @@ object MailServer {
       name <- applicationProperties.getPropertyValue(serverType, service, "name")
       host <- applicationProperties.getPropertyValue(serverType, service, "host")
       port <- Server.checkPortNumber(applicationProperties.getPropertyValue(serverType, service, "port"))
+      authentication <- applicationProperties.getPropertyValue(serverType, service, "authentication")
       username <- applicationProperties.getPropertyValue(serverType, service, "username")
       passwd <- applicationProperties.getPropertyValue(serverType, service, "passwd")
       fromAddress <- applicationProperties.getPropertyValue(serverType, service, "fromAddress")
       toAddress <- applicationProperties.getPropertyValue(serverType, service, "toAddress")
-    } yield MailServer(name, host, port, username, passwd, fromAddress, toAddress)
+    } yield MailServer(name, host, port, authentication, username, passwd, fromAddress, toAddress)
     result match {
       case Left(value) => println(s"Erreur lors de la construction : $value")
       case Right(value) => println(s"${value} contruit")

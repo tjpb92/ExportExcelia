@@ -77,7 +77,16 @@ object ExcelWriter {
     println("Fichier créé")
 
     // Write the output to a file// Write the output to a file
-    val fileOut: FileOutputStream = new FileOutputStream(new File(applicationParameters.path + "/" + applicationParameters.filename))
+    val filename = applicationParameters.suffix match {
+      case None => applicationParameters.filename
+      case Some(suffix) => {
+        val name = applicationParameters.filename.split("\\.").head
+        val extension = applicationParameters.filename.split('.').tail.head
+        s"${name}_${suffix}.${extension}"
+      }
+    }
+
+    val fileOut: FileOutputStream = new FileOutputStream(new File(applicationParameters.path + "/" + filename))
     workbook.write(fileOut)
     fileOut.close()
 
