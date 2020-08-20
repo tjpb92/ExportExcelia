@@ -41,12 +41,13 @@ object Run {
     ) =
   {
 
-    addFileToExportBuffer(applicationParameters, dbServer, Patrimonies, getNonGeolocalisePatrimonies, patrimonyReader)
+    /*addFileToExportBuffer(applicationParameters, dbServer, Patrimonies, getNonGeolocalisePatrimonies, patrimonyReader)
     addFileToExportBuffer(applicationParameters, dbServer, SimplifiedRequest, getSimplifiedRequestBetween, requestReader)
     addFileToExportBuffer(applicationParameters, dbServer, SimplifiedRequest, getNonDealtRequestBetween, nonDealtRequestReader)
     addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getTicketsOpenedFromSimplifiedRequest, TicketsOpenedFromSimplifiedRequestReader)
     addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getUsersFromTickets, UsersFromTicketsReader(true, _, _))
-    addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getUsersFromTicketsNotOpenedFromSimplifiedRequest, UsersFromTicketsReader(false, _, _))
+    addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getUsersFromTicketsNotOpenedFromSimplifiedRequest, UsersFromTicketsReader(false, _, _))*/
+    addFileToExportBuffer(applicationParameters, dbServer, Patrimonies, getNonGeolocalisePatrimonies, patrimonyReader)
 
     ExcelWriter.excelExport(aggregator.getFiles(), applicationParameters)
 

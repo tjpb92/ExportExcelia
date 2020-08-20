@@ -67,4 +67,17 @@ object Patrimonies extends Models {
 
   }
 
+  def getPatrimonyByCompanyUid(collection: BSONCollection, applicationParameters: ApplicationParameters): Future[List[Patrimony]] = {
+    val query = BSONDocument(
+      "$and" -> BSONArray (
+        BSONDocument("company.uid" -> BSONDocument(
+          "$eq" -> applicationParameters.clientUuid
+        ))
+      )
+    )
+
+    collection.find(query).cursor[Patrimony]().collect[List](maxDocs = -1, err = Cursor.FailOnError[List[Patrimony]]())
+
+  }
+
 }
