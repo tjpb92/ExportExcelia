@@ -16,8 +16,12 @@ object CaseClassReader {
    * @param patrimonies: List[CustomReader]
    * @return List avec les valeurs du CustomReader passer en paramétre + les titres
    */
-  def patrimonyReader(patrimonies: List[Patrimony], applicationParameters: ApplicationParameters): List[List[String]] = {
-    val sheetName: List[String] = List("patrimony")
+  def patrimonyReader(patrimonyFromClient: Boolean, patrimonies: List[Patrimony], applicationParameters: ApplicationParameters): List[List[String]] = {
+
+    val sheetName: List[String] = patrimonyFromClient match {
+      case true =>  List("patrimony associé au client")
+      case false =>  List("patrimony non géolocalisé")
+    }
 
     val headers: List[String] = applicationParameters.debugMode match {
       case true => List("uid", "ref", "label", "callCenterReference", "company.uid", "company.name", "agency.uid", "agency.name")
@@ -80,7 +84,7 @@ object CaseClassReader {
       request => List(
         request.uid,
         request.requestDate,
-        request.requester.name) ::: patrimonyReader(request.patrimony, applicationParameters).tail.tail.head
+        request.requester.name) ::: patrimonyReader(false, request.patrimony, applicationParameters).tail.tail.head
     }
     sheetName :: headers :: values
   }

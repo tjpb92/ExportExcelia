@@ -14,7 +14,7 @@ import com.anstel.database.{Connect, Models}
 import com.anstel.libutilsscala.{ApplicationParameters, DbServer}
 
 import com.anstel.database._
-import com.anstel.database.Patrimonies.getNonGeolocalisePatrimonies
+import com.anstel.database.Patrimonies.{getNonGeolocalisePatrimonies, getPatrimonyByCompanyUid}
 import com.anstel.database.SimplifiedRequest.{getSimplifiedRequestBetween, getNonDealtRequestBetween}
 import com.anstel.database.DetailedTicket.{getTicketsOpenedFromSimplifiedRequest, getUsersFromTickets, getUsersFromTicketsNotOpenedFromSimplifiedRequest}
 import com.anstel.export.CaseClassReader._
@@ -35,13 +35,12 @@ object Run {
    * @param applicationParameters
    * @param dbServer
    */
-  def aggregateResults(
-      applicationParameters: ApplicationParameters,
-      dbServer: DbServer,
-    ) =
-  {
+  def aggregateResults(applicationParameters: ApplicationParameters, dbServer: DbServer) = {
 
-    addFileToExportBuffer(applicationParameters, dbServer, Patrimonies, getNonGeolocalisePatrimonies, patrimonyReader)
+    addFileToExportBuffer(applicationParameters, dbServer, Patrimonies, getNonGeolocalisePatrimonies, patrimonyReader(false, _, _))
+    if(applicationParameters.patrimony) {
+      addFileToExportBuffer(applicationParameters, dbServer, Patrimonies, getPatrimonyByCompanyUid, patrimonyReader(true, _, _))
+    }
     addFileToExportBuffer(applicationParameters, dbServer, SimplifiedRequest, getSimplifiedRequestBetween, requestReader)
     addFileToExportBuffer(applicationParameters, dbServer, SimplifiedRequest, getNonDealtRequestBetween, nonDealtRequestReader)
     addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getTicketsOpenedFromSimplifiedRequest, TicketsOpenedFromSimplifiedRequestReader)

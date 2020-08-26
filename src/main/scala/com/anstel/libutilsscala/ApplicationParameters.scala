@@ -29,7 +29,7 @@ case class ApplicationParameters(db: String = DEFAULT_DB,
                                  callCenter: String = DEFAULT_CALL_CENTER,
                                  client: Option[String], clientUuid: Option[String],
                                  path: String = DEFAULT_PATH, filename: String = DEFAULT_FILENAME, suffix: Option[String],
-                                 debugMode: Boolean = DEFAULT_DEBUG_MODE, testMode: Boolean = DEFAULT_TEST_MODE)
+                                 patrimony: Boolean = DEFAULT_PATRIMONY, debugMode: Boolean = DEFAULT_DEBUG_MODE, testMode: Boolean = DEFAULT_TEST_MODE)
 
 object ApplicationParameters {
 
@@ -42,6 +42,7 @@ object ApplicationParameters {
   val DEFAULT_CALL_CENTER = "8a8a2283-0ef1-4755-b398-8ae7880766e5"  //"Excelia"
   val DEFAULT_PATH = "."
   val DEFAULT_FILENAME = "Extract.xlsx"
+  val DEFAULT_PATRIMONY = false
   val DEFAULT_DEBUG_MODE = false
   val DEFAULT_TEST_MODE = false
 
@@ -69,9 +70,10 @@ object ApplicationParameters {
       path <- getStringParameter("-path", args)
       filename <- getStringParameter("-file", args)
       suffix <- getStringParameter("-s", args)
+      patrimony <- getBooleanParameter("-patrimony", args)
       debugMode <- getBooleanParameter("-d", args)
       testMode <- getBooleanParameter("-t", args)
-      applicationParameters <- checkAndCreate(db, begDate, endDate, nbDay, callCenter, client, clientUuid, path, filename, suffix,
+      applicationParameters <- checkAndCreate(db, begDate, endDate, nbDay, callCenter, client, clientUuid, path, filename, suffix, patrimony,
         debugMode, testMode)
     } yield applicationParameters
     result match {
@@ -169,7 +171,7 @@ object ApplicationParameters {
   def checkAndCreate(db: Option[String], begDate: Option[LocalDate], endDate: Option[LocalDate], nbDay: Option[Int],
                      callCenter: Option[String], client: Option[String], clientUuid: Option[String],
                      path: Option[String], filename: Option[String], suffix: Option[String],
-                     debugMode: Option[Boolean], testMode: Option[Boolean]) : Either[String, ApplicationParameters] = for {
+                     patrimony: Option[Boolean], debugMode: Option[Boolean], testMode: Option[Boolean]) : Either[String, ApplicationParameters] = for {
     checkedDb <- Right(db.getOrElse(DEFAULT_DB))
     checkedBegDate <- Right(begDate.getOrElse(DEFAULT_BEGDATE))
     checkedEndDate <- Right(endDate.getOrElse(DEFAULT_ENDDATE))
@@ -180,13 +182,14 @@ object ApplicationParameters {
     checkedPath <- Right(path.getOrElse(DEFAULT_PATH))
     checkedFilename <- Right(filename.getOrElse(DEFAULT_FILENAME))
     checkedSuffix <- Right(suffix)
+    checkedPatrimony <- Right(patrimony.getOrElse(DEFAULT_PATRIMONY))
     checkedDebugMode <- Right(debugMode.getOrElse(DEFAULT_DEBUG_MODE))
     checkedTestMode <- Right(testMode.getOrElse(DEFAULT_TEST_MODE))
     checkedDatesFilter <- checkDatesFilter(checkedBegDate, checkedEndDate)
     checkedClientFilter <- checkClientFilter(checkedClient, checkedClientUuid)
     checkedClientDatesSelector <- checkDatesSelector(begDate, endDate, nbDay)
   } yield ApplicationParameters(checkedDb, checkedBegDate, checkedEndDate, checkedNbDay, checkedCallCenter ,
-    checkedClient, checkedClientUuid, checkedPath, checkedFilename, checkedSuffix, checkedDebugMode, checkedTestMode)
+    checkedClient, checkedClientUuid, checkedPath, checkedFilename, checkedSuffix, checkedPatrimony, checkedDebugMode, checkedTestMode)
 
   /**
    * Vérifie que la date de début est antérieure à la date de fin
