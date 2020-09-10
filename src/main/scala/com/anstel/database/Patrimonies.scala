@@ -75,7 +75,10 @@ object Patrimonies extends Models {
           "$eq" -> uuid
         ))
       )
-      case None => BSONDocument()
+      case None => {
+        println("Identifiant du client pour l'export des patrimoines introuvables")
+        BSONDocument("NotExistingFile" -> BSONDocument("$eq" -> 1))
+      }
     }
 
     collection.find(query).cursor[Patrimony]().collect[List](maxDocs = -1, err = Cursor.FailOnError[List[Patrimony]]())
