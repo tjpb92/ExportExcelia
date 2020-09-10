@@ -69,7 +69,6 @@ object Patrimonies extends Models {
 
   def getPatrimonyByCompanyUid(collection: BSONCollection, applicationParameters: ApplicationParameters): Future[List[Patrimony]] = {
 
-    val query = applicationParameters.clientUuid match {
       case Some(uuid) => BSONDocument(
         BSONDocument("company.uid" -> BSONDocument(
           "$eq" -> uuid

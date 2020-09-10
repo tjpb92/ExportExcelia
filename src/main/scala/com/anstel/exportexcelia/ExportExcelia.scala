@@ -44,6 +44,4 @@ object ExportExcelia extends App {
     System.exit(0)
 
   }
-
-
 }
