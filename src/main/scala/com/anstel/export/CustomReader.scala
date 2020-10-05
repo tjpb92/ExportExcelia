@@ -195,8 +195,32 @@ object CustomReader {
     }
   }
 
+
   /**
-   *  CustomReader Utiliser pour l'export de DetailedTicket.getTicketsOpenedFromSimplifiedRequest
+   * CustomReader Utilisé pour l'export de DetailedTicket.getTicketsFromAClientCompany
+   */
+  case class Tickets(uid: String, ref: String, created: String, agency: Agency, user: User) extends AbstractCustomReader
+
+  object Tickets {
+    implicit object TicketsReader extends BSONDocumentReader[Tickets] {
+      def read(doc: BSONDocument): Tickets = {
+        val uid = doc.getAs[String]("uid").getOrElse("non renseigné")
+        val ref = doc.getAs[String]("ref").getOrElse("non renseigné")
+        val created = doc.getAs[BSONDateTime]("created").getOrElse(BSONDateTime(0L))
+        val agency = doc.getAs[Agency]("firstAgency").getOrElse(Agency("non, renseigné", "non renseigné"))
+        val user = doc.getAs[User]("user").getOrElse(User("non renseigné", "non renseigné", "non renseigné", "non renseigné"))
+
+        val createdParsed: String = created match {
+          case BSONDateTime(value) => Instant.ofEpochMilli(value).toString()
+        }
+
+        Tickets(uid, ref, createdParsed, agency, user)
+      }
+    }
+  }
+
+  /**
+   *  CustomReader Utilisé pour l'export de DetailedTicket.getTicketsOpenedFromSimplifiedRequest
    *
    * @param uid
    * @param created

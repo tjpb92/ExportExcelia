@@ -16,7 +16,7 @@ import com.anstel.libutilsscala.{ApplicationParameters, DbServer}
 import com.anstel.database._
 import com.anstel.database.Patrimonies.{getNonGeolocalisePatrimonies, getPatrimonyByCompanyUid}
 import com.anstel.database.SimplifiedRequest.{getSimplifiedRequestBetween, getNonDealtRequestBetween}
-import com.anstel.database.DetailedTicket.{getTicketsOpenedFromSimplifiedRequest, getUsersFromTickets, getUsersFromTicketsNotOpenedFromSimplifiedRequest}
+import com.anstel.database.DetailedTicket.{getTicketsOpenedFromSimplifiedRequest, getUsersFromTickets, getUsersFromTicketsNotOpenedFromSimplifiedRequest, getTicketsByCompanyUid}
 import com.anstel.export.CaseClassReader._
 
 /**
@@ -46,6 +46,9 @@ object Run {
     addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getTicketsOpenedFromSimplifiedRequest, TicketsOpenedFromSimplifiedRequestReader)
     addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getUsersFromTickets, UsersFromTicketsReader(true, _, _))
     addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getUsersFromTicketsNotOpenedFromSimplifiedRequest, UsersFromTicketsReader(false, _, _))
+    if(applicationParameters.tickets) {
+      addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getTicketsByCompanyUid, TicketsReader)
+    }
 
     ExcelWriter.excelExport(aggregator.getFiles(), applicationParameters)
 

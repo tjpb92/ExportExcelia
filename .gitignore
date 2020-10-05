@@ -12,5 +12,6 @@ target
 
 ExportExcelia.prop
 Extract.xlsx
+validExtraction.xlsx
 src/test/scala/com.anstel.libutilscalatest/ApplicationParametersTest.scala
 .~lock.Extract.xlsx#

@@ -1,6 +1,6 @@
 package com.anstel.export
 
-import com.anstel.export.CustomReader.{Patrimony, Request, NonDealtRequest, TicketsOpenedFromSimplifiedRequest, UsersFromTickets, User}
+import com.anstel.export.CustomReader.{Patrimony, Request, NonDealtRequest, TicketsOpenedFromSimplifiedRequest, UsersFromTickets, User, Tickets}
 import com.anstel.libutilsscala.ApplicationParameters
 
 /**
@@ -135,6 +135,52 @@ object CaseClassReader {
     val usersHeaders: List[String] = headers ::: List.fill(usersNumbers.maxOption.getOrElse(0))(List("user.uid", "user.firstname", "user.lastname", "user.job")).flatten
 
     sheetName :: usersHeaders :: values
+  }
+
+  /**
+   *
+   */
+  def TicketsReader(tickets: List[Tickets], applicationParameters: ApplicationParameters): List[List[String]] = {
+    val sheetName: List[String] = List("tickets du client")
+
+    val headers: List[String] = applicationParameters.debugMode match {
+      case true => List(
+        "uid",
+        "ref",
+        "created",
+        "agency.uid",
+        "agency.name",
+        "user.lastName",
+        "user.firstName",
+        "user.job"
+      )
+      case false => List(
+        "uid",
+        "ref",
+        "created",
+        "agency.uid",
+        "agency.name",
+        "user.lastName",
+        "user.firstName",
+        "user.job"
+      )
+    }
+
+    val values = tickets.map {
+      ticket => List(
+        ticket.uid,
+        ticket.ref,
+        ticket.created,
+        ticket.agency.uid,
+        ticket.agency.name,
+        ticket.user.lastName,
+        ticket.user.firstName,
+        ticket.user.job
+      )
+    }
+
+    sheetName :: headers :: values
+
   }
 
   /**
