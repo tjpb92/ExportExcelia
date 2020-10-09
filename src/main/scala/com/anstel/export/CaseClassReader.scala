@@ -1,6 +1,9 @@
 package com.anstel.export
 
-import com.anstel.export.CustomReader.{Patrimony, Request, NonDealtRequest, TicketsOpenedFromSimplifiedRequest, UsersFromTickets, User, Tickets}
+import java.util.concurrent.TimeUnit
+
+import com.anstel.`export`.CustomReader.JournalEvent
+import com.anstel.export.CustomReader.{NonDealtRequest, Patrimony, Request, Tickets, TicketsOpenedFromSimplifiedRequest, User, UsersFromTickets}
 import com.anstel.libutilsscala.ApplicationParameters
 
 /**
@@ -137,6 +140,10 @@ object CaseClassReader {
     sheetName :: usersHeaders :: values
   }
 
+  def eventReader(events: List[JournalEvent]): List[List[String]] = {
+    for(event <- events) yield List(event.eventType, event.sendDate)
+  }
+
   /**
    *
    */
@@ -148,38 +155,120 @@ object CaseClassReader {
         "uid",
         "ref",
         "created",
+        "closed",
+        "transmissionDelay",
+        "openingTicketPurpose.callPurpose.",
+        "caller.name.value",
+        "patrimony.uid",
+        "patrimony.ref",
+        "address.street",
+        "address.zipCode",
+        "address.city",
         "agency.uid",
         "agency.name",
         "user.lastName",
         "user.firstName",
-        "user.job"
+        "user.job",
       )
       case false => List(
-        "uid",
-        "ref",
-        "created",
-        "agency.uid",
-        "agency.name",
-        "user.lastName",
-        "user.firstName",
-        "user.job"
+        "uid du ticket",
+        "ref du ticket",
+        "date de création",
+        "date de cloture",
+        "Delai de transmission",
+        "Delai de transmission (s)",
+        "qualification",
+        "appelant",
+        "uid patrimoine",
+        "ref patrimoine",
+        "address",
+        "code postale",
+        "ville",
+        "uid agence",
+        "nom agence",
+        "nom primo-intervenant",
+        "prenom primo-intervenant",
+        "poste primo-intervenant",
       )
     }
+
 
     val values = tickets.map {
-      ticket => List(
-        ticket.uid,
-        ticket.ref,
-        ticket.created,
-        ticket.agency.uid,
-        ticket.agency.name,
-        ticket.user.lastName,
-        ticket.user.firstName,
-        ticket.user.job
-      )
+      ticket => {
+        val patrimony: Patrimony = ticket.linkedEntities.patrimony.uid match {
+          case "non renseigné" => {
+            ticket.patrimony
+          }
+          case _ => {
+            ticket.linkedEntities.patrimony
+          }
+        }
+
+        val name: String  = ticket.caller.ticketCallerName.nameType match {
+          case "CivilName" => s"${ticket.caller.ticketCallerName.firstName} ${ticket.caller.ticketCallerName.lastName}"
+          case "PoorName" => s"${ticket.caller.ticketCallerName.value}"
+          case _ => "non renseigné"
+        }
+
+        val format = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+        val interventionAcceptedDate = ticket.journal.filter( event => event.eventType == "InterventionAccepted" || event.eventType == "MissionAccepted")
+
+        val transmissionDelay: Either[String, Long] = interventionAcceptedDate match {
+          case list if list.length == 0 => Left("intervention non accepté")
+          case list => Right(format.parse(list.head.sendDate).getTime - format.parse(ticket.created).getTime)
+        }
+
+        val TransmissionDelaySeconds = transmissionDelay match {
+          case Left(value) => value
+          case Right(millis) => TimeUnit.MILLISECONDS.toSeconds(millis).toString
+        }
+
+        val TransmissionDelayParsed = transmissionDelay match {
+          case Left(value) => value
+          case Right(millis) => String.format("%02dj %02d:%02d:%02d",
+            TimeUnit.MILLISECONDS.toDays(millis),
+
+            TimeUnit.MILLISECONDS.toHours(millis) -
+              TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays(millis)),
+
+            TimeUnit.MILLISECONDS.toMinutes(millis) -
+              TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+
+            TimeUnit.MILLISECONDS.toSeconds(millis) -
+              TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+        }
+
+        List(
+          ticket.uid,
+          ticket.ref,
+          ticket.created,
+          ticket.closed,
+          TransmissionDelayParsed,
+          TransmissionDelaySeconds,
+          ticket.openingTicketPurpose.callPurpose,
+          name,
+          patrimony.uid,
+          patrimony.ref,
+          ticket.address.street,
+          ticket.address.zipCode,
+          ticket.address.city,
+          ticket.agency.uid,
+          ticket.agency.name,
+          ticket.user.lastName,
+          ticket.user.firstName,
+          ticket.user.job,
+        ) ::: eventReader(ticket.journal).flatten
+      }
     }
 
-    sheetName :: headers :: values
+    // val usersNumbers: List[Int] = for(value <- values) yield (value.length - 3) / 4
+    // val usersHeaders: List[String] = headers ::: List.fill(usersNumbers.maxOption.getOrElse(0))(List("user.uid", "user.firstname", "user.lastname", "user.job")).flatten
+
+
+    val eventNumbers: List[Int] = for(value <- values) yield (value.length - 16) / 2
+    val journalEventHeaders: List[String] = headers ::: List.fill(eventNumbers.maxOption.getOrElse(0))(List("type d'evenement", "date d'evenement")).flatten
+
+    sheetName :: journalEventHeaders :: values
 
   }
 

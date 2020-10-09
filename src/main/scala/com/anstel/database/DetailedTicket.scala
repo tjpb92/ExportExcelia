@@ -242,7 +242,17 @@ object DetailedTicket extends Models {
             "_id" -> 0,
             "uid" -> 1,
             "ref" -> 1,
+            "linkedEntities" -> 1,
+            "patrimony" -> 1,
             "created" -> 1,
+            "closed" -> 1,
+            "openingTicketPurpose" -> 1,
+            "caller" -> 1,
+            "address.street" -> 1,
+            "address.zipCode" -> 1,
+            "address.city" -> 1,
+            "journal" -> 1,
+            // AGENCY
             "firstAgency.uid" -> 1,
             "firstAgency.name" -> 1,
             //  USER

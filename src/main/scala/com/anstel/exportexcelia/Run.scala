@@ -37,7 +37,7 @@ object Run {
    */
   def aggregateResults(applicationParameters: ApplicationParameters, dbServer: DbServer) = {
 
-    addFileToExportBuffer(applicationParameters, dbServer, Patrimonies, getNonGeolocalisePatrimonies, patrimonyReader(false, _, _))
+    /*addFileToExportBuffer(applicationParameters, dbServer, Patrimonies, getNonGeolocalisePatrimonies, patrimonyReader(false, _, _))
     if(applicationParameters.patrimony) {
       addFileToExportBuffer(applicationParameters, dbServer, Patrimonies, getPatrimonyByCompanyUid, patrimonyReader(true, _, _))
     }
@@ -48,11 +48,37 @@ object Run {
     addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getUsersFromTicketsNotOpenedFromSimplifiedRequest, UsersFromTicketsReader(false, _, _))
     if(applicationParameters.tickets) {
       addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getTicketsByCompanyUid, TicketsReader)
-    }
+    }*/
 
+    addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getTicketsByCompanyUid, TicketsReader)
     ExcelWriter.excelExport(aggregator.getFiles(), applicationParameters)
 
   }
+
+
+  /*def aggregateResults(applicationParameters: ApplicationParameters, dbServer: DbServer) = {
+
+    val results = for {
+      a <- addFileToExportBuffer(applicationParameters, dbServer, Patrimonies, getNonGeolocalisePatrimonies, patrimonyReader(false, _, _))
+      b <- addFileToExportBuffer(applicationParameters, dbServer, Patrimonies, getPatrimonyByCompanyUid, patrimonyReader(true, _, _)) if(applicationParameters.patrimony)
+      c <- addFileToExportBuffer(applicationParameters, dbServer, SimplifiedRequest, getSimplifiedRequestBetween, requestReader)
+      d <- addFileToExportBuffer(applicationParameters, dbServer, SimplifiedRequest, getNonDealtRequestBetween, nonDealtRequestReader)
+      e <- addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getTicketsOpenedFromSimplifiedRequest, TicketsOpenedFromSimplifiedRequestReader)
+      f <- addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getUsersFromTickets, UsersFromTicketsReader(true, _, _))
+      g <- addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getUsersFromTicketsNotOpenedFromSimplifiedRequest, UsersFromTicketsReader(false, _, _))
+      h <- addFileToExportBuffer(applicationParameters, dbServer, DetailedTicket, getTicketsByCompanyUid, TicketsReader) if (applicationParameters.tickets)
+    } yield List(a, b, c, d, e, f, g, h)
+
+    results.onComplete { value =>
+      value match {
+        case Success(files) =>
+          println("sending data to excel writer")
+          ExcelWriter.excelExport(files, applicationParameters)
+        case Failure(f) =>
+          println("FAILURE" + f.getMessage())
+      }
+    }
+  }*/
 
 
   /**
@@ -81,7 +107,6 @@ object Run {
               case Success(data) => {
                 if(applicationParameters.debugMode) {
                   println(s"recuperation des donnes associees a $caseClassReader")
-
                   println(s"${data.length} resultat ajoute au buffer")
                 }
                 aggregator.setFiles(caseClassReader(data, applicationParameters))
@@ -95,5 +120,33 @@ object Run {
       case Failure(f) => println("FAILURE" + f.getMessage())
     }
   }
+
+  /*def addFileToExportBuffer[A <: AbstractCustomReader](
+    applicationParameters: ApplicationParameters,
+    dbServer: DbServer,
+    model: Models,
+    query: (BSONCollection, ApplicationParameters) => Future[List[A]],
+    caseClassReader: (List[A], ApplicationParameters) => List[List[String]]
+  ) = {
+    val result = for {
+      connection <- Connect.connection(dbServer)
+      collection <- model.getCollection(connection, dbServer)
+      data <- query(collection, applicationParameters)
+      //result <- caseClassReader(data, applicationParameters)
+      result <- caseClassReader(data, applicationParameters)
+    } yield result
+
+    result
+
+    /*result.onComplete { value =>
+      value match {
+        case Success(value) =>
+          Right(caseClassReader(value, applicationParameters))
+        case Failure(f) =>
+          Left(println("FAILURE" + f.getMessage()))
+      }
+    }*/
+
+  }*/
 
 }
